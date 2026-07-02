@@ -9,33 +9,48 @@ import { setAuthTokenGetter } from '@workspace/api-client-react';
 // Configure the API client to send the stored JWT on every request
 setAuthTokenGetter(() => localStorage.getItem('jwtToken'));
 
-// Components
+// Layout
 import { Shell } from '@/components/shell';
 import { ProtectedRoute } from '@/components/protected-route';
 
-// Pages
+// Pages — public
 import { LandingPage } from '@/pages/landing';
 import { LoginPage } from '@/pages/auth/login';
 import { RegisterPage } from '@/pages/auth/register';
-import { StudentDashboard } from '@/pages/dashboard/student';
-import { RecruiterDashboard } from '@/pages/dashboard/recruiter';
 import { JobsPage } from '@/pages/jobs/index';
 import { JobDetailPage } from '@/pages/jobs/detail';
+import { CompaniesPage } from '@/pages/companies/index';
+
+// Pages — tools
 import { ResumeAnalysisPage } from '@/pages/tools/resume-analysis';
+import { ResumeBuilderPage } from '@/pages/tools/resume-builder';
+import { InterviewPracticePage } from '@/pages/tools/interview-practice';
+import { CareerRoadmapPage } from '@/pages/tools/career-roadmap';
 
-const queryClient = new QueryClient();
+// Pages — protected dashboards
+import { StudentDashboard } from '@/pages/dashboard/student';
+import { RecruiterDashboard } from '@/pages/dashboard/recruiter';
 
-// Shell Wrapper for pages that need navbar/footer
+// Pages — footer / informational
+import { AboutPage } from '@/pages/about';
+import { PrivacyPage } from '@/pages/legal/privacy';
+import { TermsPage } from '@/pages/legal/terms';
+import { CookiesPage } from '@/pages/legal/cookies';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30_000,
+    },
+  },
+});
+
 function ShellRoute({ component: Component }: { component: React.ComponentType }) {
-  return (
-    <Shell>
-      <Component />
-    </Shell>
-  );
+  return <Shell><Component /></Shell>;
 }
 
-// Protected Shell Wrapper
-function ProtectedShellRoute({ component: Component, allowedRoles }: { component: React.ComponentType, allowedRoles?: string[] }) {
+function ProtectedShellRoute({ component: Component, allowedRoles }: { component: React.ComponentType; allowedRoles?: string[] }) {
   return (
     <Shell>
       <ProtectedRoute allowedRoles={allowedRoles}>
@@ -48,25 +63,27 @@ function ProtectedShellRoute({ component: Component, allowedRoles }: { component
 function Router() {
   return (
     <Switch>
-      {/* Public Routes with Shell */}
-      <Route path="/">
-        <ShellRoute component={LandingPage} />
-      </Route>
-      <Route path="/jobs">
-        <ShellRoute component={JobsPage} />
-      </Route>
-      <Route path="/jobs/:id">
-        <ShellRoute component={JobDetailPage} />
-      </Route>
-      <Route path="/resume-analysis">
-        <ShellRoute component={ResumeAnalysisPage} />
-      </Route>
-      
-      {/* Auth Routes (No Shell needed usually, but keeping consistent background) */}
+      {/* Landing */}
+      <Route path="/"><ShellRoute component={LandingPage} /></Route>
+
+      {/* Auth */}
       <Route path="/auth/login" component={LoginPage} />
       <Route path="/auth/register" component={RegisterPage} />
 
-      {/* Protected Dashboards */}
+      {/* Jobs */}
+      <Route path="/jobs"><ShellRoute component={JobsPage} /></Route>
+      <Route path="/jobs/:id"><ShellRoute component={JobDetailPage} /></Route>
+
+      {/* Companies */}
+      <Route path="/companies"><ShellRoute component={CompaniesPage} /></Route>
+
+      {/* Tools */}
+      <Route path="/resume-analysis"><ShellRoute component={ResumeAnalysisPage} /></Route>
+      <Route path="/resume-builder"><ShellRoute component={ResumeBuilderPage} /></Route>
+      <Route path="/interview-practice"><ShellRoute component={InterviewPracticePage} /></Route>
+      <Route path="/career-roadmap"><ShellRoute component={CareerRoadmapPage} /></Route>
+
+      {/* Protected dashboards */}
       <Route path="/dashboard/student">
         <ProtectedShellRoute component={StudentDashboard} allowedRoles={['student']} />
       </Route>
@@ -74,10 +91,14 @@ function Router() {
         <ProtectedShellRoute component={RecruiterDashboard} allowedRoles={['recruiter']} />
       </Route>
 
-      {/* 404 Route */}
-      <Route>
-        <ShellRoute component={NotFound} />
-      </Route>
+      {/* About & legal */}
+      <Route path="/about"><ShellRoute component={AboutPage} /></Route>
+      <Route path="/privacy"><ShellRoute component={PrivacyPage} /></Route>
+      <Route path="/terms"><ShellRoute component={TermsPage} /></Route>
+      <Route path="/cookies"><ShellRoute component={CookiesPage} /></Route>
+
+      {/* 404 */}
+      <Route><ShellRoute component={NotFound} /></Route>
     </Switch>
   );
 }
