@@ -1,0 +1,696 @@
+# JobConnect AI – Replit AI Website Generation Prompt
+
+You are an expert Senior Full Stack Software Engineer, UI/UX Designer, and AI Architect.
+
+Your task is to build a **production-ready, scalable, modern SaaS web application** called:
+
+# JobConnect AI – Intelligent Career & Recruitment Platform
+
+This should NOT look like a college project.
+
+The application should look and behave like a startup product comparable to LinkedIn, Indeed, Glassdoor, Wellfound, and modern AI SaaS platforms.
+
+Build the application with clean architecture, reusable components, responsive layouts, and production-quality code.
+
+---
+
+# Tech Stack
+
+Frontend
+
+* React.js (Vite)
+* Tailwind CSS
+* Redux Toolkit
+* React Router DOM
+* Framer Motion
+* Axios
+* React Hook Form
+
+Backend
+
+* Node.js
+* Express.js
+
+Database
+
+* MongoDB Atlas
+* Mongoose
+
+Authentication
+
+* JWT Authentication
+* Google OAuth
+
+Real-Time
+
+* Socket.io
+
+Storage
+
+* Cloudinary
+
+Email
+
+* Nodemailer
+
+AI
+
+* Python Microservice
+* Google Gemini API
+* spaCy
+* Scikit-learn
+
+Deployment Ready
+
+* Vercel (Frontend)
+* Render (Backend)
+
+---
+
+# Build the project using the following folder structure
+
+frontend/
+backend/
+python-ai/
+shared/
+
+The code should be modular.
+
+Separate
+
+* Components
+* Pages
+* Layouts
+* Hooks
+* Context
+* Redux
+* Services
+* Utilities
+* API
+* Models
+* Controllers
+* Routes
+* Middleware
+
+No messy code.
+
+---
+
+# Design Requirements
+
+Create a premium SaaS UI.
+
+Use
+
+* Glassmorphism
+* Soft shadows
+* Rounded cards
+* Smooth animations
+* Professional typography
+* Gradient buttons
+* Blue + Purple theme
+* Beautiful illustrations
+* Premium icons
+* Responsive layout
+* Dark Mode
+* Light Mode
+
+The UI should feel like a product people would actually use.
+
+Every page should have proper spacing, loading states, empty states, animations, and error handling.
+
+---
+
+# Landing Page
+
+Design a beautiful landing page containing
+
+Hero Section
+
+Navigation Bar
+
+Search Jobs
+
+AI Resume Checker CTA
+
+AI Interview CTA
+
+Features Section
+
+Statistics
+
+Featured Companies
+
+Latest Jobs
+
+Testimonials
+
+Pricing (Future Ready)
+
+FAQ
+
+Footer
+
+---
+
+# Authentication
+
+Create
+
+Student Login
+
+Student Signup
+
+Recruiter Login
+
+Recruiter Signup
+
+Admin Login
+
+Forgot Password
+
+Reset Password
+
+Email Verification
+
+Google Login
+
+JWT Authentication
+
+Role Based Authentication
+
+---
+
+# Student Dashboard
+
+After login the student should have a complete dashboard containing
+
+Dashboard Overview
+
+Complete Profile
+
+Resume Builder
+
+Resume Upload
+
+Resume Preview
+
+Portfolio Links
+
+Education
+
+Experience
+
+Skills
+
+Projects
+
+Achievements
+
+Certifications
+
+Social Links
+
+Saved Jobs
+
+Applied Jobs
+
+Application Tracker
+
+Job Alerts
+
+Internships
+
+Notifications
+
+Settings
+
+Profile Analytics
+
+---
+
+# AI Resume Builder
+
+Allow users to create professional resumes using templates.
+
+Generate
+
+Professional Summary
+
+Project Description
+
+Achievements
+
+Skills
+
+Resume Bullet Points
+
+Export
+
+PDF
+
+DOCX
+
+Resume Preview
+
+---
+
+# Resume Analysis
+
+Upload Resume
+
+Extract
+
+Name
+
+Email
+
+Phone
+
+Education
+
+Experience
+
+Projects
+
+Skills
+
+Certifications
+
+Display
+
+ATS Score
+
+Resume Strength
+
+Missing Keywords
+
+Grammar Suggestions
+
+Formatting Suggestions
+
+Resume Improvement Suggestions
+
+---
+
+# AI Job Recommendation
+
+Recommend jobs using
+
+Skills
+
+Resume
+
+Experience
+
+Education
+
+Location
+
+Interests
+
+Display
+
+Job Match Percentage
+
+Missing Skills
+
+Salary Estimate
+
+Recommended Companies
+
+Recommended Jobs
+
+---
+
+# Skill Gap Analysis
+
+Compare
+
+Candidate Skills
+
+with
+
+Job Requirements
+
+Display
+
+Skill Match %
+
+Missing Skills
+
+Recommended Courses
+
+Learning Roadmap
+
+Estimated Learning Time
+
+---
+
+# AI Interview Practice
+
+Generate
+
+Technical Questions
+
+HR Questions
+
+Behavioral Questions
+
+Coding Questions
+
+Role-Based Questions
+
+Evaluate
+
+Answer Quality
+
+Confidence
+
+Communication
+
+Suggestions
+
+Overall Score
+
+Store interview history.
+
+---
+
+# Career Roadmap
+
+Generate personalized career roadmaps for
+
+Software Engineer
+
+Frontend Developer
+
+Backend Developer
+
+Full Stack Developer
+
+AI Engineer
+
+Data Scientist
+
+Cloud Engineer
+
+Cybersecurity Engineer
+
+Display
+
+Weekly Plan
+
+Monthly Plan
+
+Projects
+
+Courses
+
+Certifications
+
+Resources
+
+---
+
+# Job Portal
+
+Search Jobs
+
+Apply Jobs
+
+Save Jobs
+
+Recommended Jobs
+
+Trending Jobs
+
+Latest Jobs
+
+Internships
+
+Remote Jobs
+
+Company Pages
+
+Advanced Filters
+
+Location Search
+
+Salary Filter
+
+Experience Filter
+
+Skills Filter
+
+Application Status
+
+---
+
+# Recruiter Dashboard
+
+Recruiters should be able to
+
+Create Company
+
+Manage Company
+
+Post Jobs
+
+Edit Jobs
+
+Delete Jobs
+
+Search Candidates
+
+Filter Candidates
+
+View Candidate Profiles
+
+Download Resume
+
+AI Resume Screening
+
+Candidate Match %
+
+Shortlist
+
+Reject
+
+Schedule Interviews
+
+Send Emails
+
+Real-Time Chat
+
+Hiring Analytics
+
+---
+
+# Admin Dashboard
+
+Admin should manage
+
+Students
+
+Recruiters
+
+Companies
+
+Jobs
+
+Applications
+
+Reports
+
+Analytics
+
+Platform Statistics
+
+Approve Recruiters
+
+Remove Spam
+
+System Monitoring
+
+---
+
+# Real-Time Features
+
+Implement Socket.io for
+
+Chat
+
+Typing Indicator
+
+Online Status
+
+Notifications
+
+Interview Invitations
+
+Application Updates
+
+---
+
+# Analytics
+
+Student Analytics
+
+Applications
+
+Interview Performance
+
+ATS History
+
+Resume Performance
+
+Job Match %
+
+Recruiter Analytics
+
+Applicants
+
+Hiring Funnel
+
+Top Skills
+
+Hiring Statistics
+
+Admin Analytics
+
+Platform Growth
+
+User Growth
+
+Job Growth
+
+Recruiter Growth
+
+AI Usage Statistics
+
+---
+
+# Database Models
+
+Users
+
+Students
+
+Recruiters
+
+Companies
+
+Jobs
+
+Applications
+
+Messages
+
+Notifications
+
+Resumes
+
+Interviews
+
+Courses
+
+Roadmaps
+
+SavedJobs
+
+JobAlerts
+
+Reports
+
+---
+
+# Security
+
+Password Hashing
+
+JWT
+
+Protected Routes
+
+Role-Based Access
+
+Input Validation
+
+Secure File Upload
+
+Rate Limiting
+
+Environment Variables
+
+Error Handling
+
+---
+
+# AI Architecture
+
+Resume Upload
+
+↓
+
+Text Extraction
+
+↓
+
+spaCy Skill Extraction
+
+↓
+
+ATS Score
+
+↓
+
+Skill Gap Analysis
+
+↓
+
+Machine Learning Recommendation
+
+↓
+
+Gemini AI
+
+↓
+
+Resume Suggestions
+
+↓
+
+Career Roadmap
+
+↓
+
+Interview Questions
+
+---
+
+# Important Instructions
+
+Build the application as a real startup-quality SaaS product.
+
+Do NOT use dummy dashboards with static data.
+
+Use reusable React components.
+
+Use proper REST APIs.
+
+Use MongoDB models.
+
+Create clean folder structure.
+
+Write maintainable code.
+
+Use responsive design.
+
+Use professional UI.
+
+If an AI feature cannot be fully implemented immediately, scaffold it with proper backend APIs and placeholder services so it can be connected later without changing the architecture.
+
+Generate all required pages, routing, API structure, database models, authentication flow, and dashboard layouts.
+
+The final result should feel like a commercial AI career platform that is ready for future development and deployment.

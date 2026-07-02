@@ -1,0 +1,3 @@
+- [JobConnect AI auth scheme](jobconnect-auth.md) — HMAC-signed tokens (SESSION_SECRET); replace sha256 password hashing with bcrypt for prod
+- [JobConnect AI API structure](jobconnect-api-structure.md) — OpenAPI-first: edit openapi.yaml then run codegen; never edit generated files
+- [JobConnect AI access control](jobconnect-access-control.md) — Recruiters must specify jobId in /applications (ownership enforced); jobs PUT/DELETE check postedById
