@@ -1,9 +1,16 @@
-import { createRoot } from 'react-dom/client';
-import { setAuthTokenGetter } from "@workspace/api-client-react";
-import App from './App';
-import './index.css';
+import { createRoot } from "react-dom/client";
+import {
+  setAuthTokenGetter,
+  setBaseUrl,
+} from "@workspace/api-client-react";
 
-// Set auth token getter for API client queries and mutations
+import App from "./App";
+import "./index.css";
+
+// 👇 Backend URL
+setBaseUrl("https://jobconnect-backend-mmkw.onrender.com");
+
+// 👇 JWT
 setAuthTokenGetter(() => localStorage.getItem("jwtToken"));
 
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById("root")!).render(<App />);
