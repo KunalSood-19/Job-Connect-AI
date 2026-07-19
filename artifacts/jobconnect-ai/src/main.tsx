@@ -9,6 +9,7 @@ import "./index.css";
 
 // 👇 Backend URL
 setBaseUrl("https://jobconnect-backend-mmkw.onrender.com");
+console.log("Base URL configured");
 
 // 👇 JWT
 setAuthTokenGetter(() => localStorage.getItem("jwtToken"));
