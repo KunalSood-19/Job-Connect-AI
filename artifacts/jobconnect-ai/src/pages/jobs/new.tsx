@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getMe } from "@/api/auth";
 import { useLocation } from "wouter";
 import { useCreateJob, useGetMe } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -39,18 +40,14 @@ console.log("COMPANY ID =", (user as any)?.user?.recruiter?.companyId);
  useEffect(() => {
   const token = localStorage.getItem("jwtToken");
 
-  console.log("TOKEN:", token);
+  if (!token) {
+    setUserLoading(false);
+    return;
+  }
 
-  fetch("https://jobconnect-backend-mmkw.onrender.com/api/auth/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(async (r) => {
-      const data = await r.json();
-      console.log("STATUS:", r.status);
+  getMe(token)
+    .then((data) => {
       console.log("DATA:", data);
-
       setUser(data);
       setUserLoading(false);
     })
