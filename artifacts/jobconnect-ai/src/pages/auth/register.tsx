@@ -2,7 +2,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, Link, useSearch } from "wouter";
-import { useRegister, useGetMe } from "@workspace/api-client-react";
+import { register, getMe } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,15 +34,41 @@ export function RegisterPage() {
   
   const [roleTab, setRoleTab] = useState<"student" | "recruiter">(defaultRole);
   
-  const { data: user, isLoading: isUserLoading } = useGetMe();
-  const registerMutation = useRegister();
+ 
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!isUserLoading && user) {
-      setLocation(`/dashboard/${user.role}`);
+ useEffect(() => {
+  async function checkUser() {
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) return;
+
+    try {
+      const data = await getMe(token);
+
+      switch (data.user.role) {
+        case "STUDENT":
+          setLocation("/dashboard/student");
+          break;
+
+        case "RECRUITER":
+          setLocation("/dashboard/recruiter");
+          break;
+
+        case "ADMIN":
+          setLocation("/");
+          break;
+
+        default:
+          setLocation("/");
+      }
+    } catch {
+      localStorage.removeItem("jwtToken");
     }
-  }, [user, isUserLoading, setLocation]);
+  }
+
+  checkUser();
+}, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,28 +86,51 @@ export function RegisterPage() {
     form.setValue("role", role);
   };
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    registerMutation.mutate(
-      { data: values },
-      {
-        onSuccess: (data) => {
-          localStorage.setItem("jwtToken", data.token);
-          toast({
-            title: "Account created",
-            description: "Welcome to JobConnect AI!",
-          });
-          setLocation(`/dashboard/${data.user.role}`);
-        },
-        onError: (error: any) => {
-          toast({
-            title: "Registration failed",
-            description: error?.message || "There was a problem creating your account.",
-            variant: "destructive",
-          });
-        },
-      }
-    );
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    const data = await register({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role:
+        values.role === "student"
+          ? "STUDENT"
+          : "RECRUITER",
+    });
+
+    localStorage.setItem("jwtToken", data.token);
+
+    toast({
+      title: "Account created",
+      description: "Welcome to JobConnect AI!",
+    });
+
+    switch (data.user.role) {
+      case "STUDENT":
+        setLocation("/dashboard/student");
+        break;
+
+      case "RECRUITER":
+        setLocation("/dashboard/recruiter");
+        break;
+
+      case "ADMIN":
+        setLocation("/");
+        break;
+
+      default:
+        setLocation("/");
+    }
+  } catch (error: any) {
+    toast({
+      title: "Registration failed",
+      description:
+        error?.response?.data?.message ??
+        "Registration failed",
+      variant: "destructive",
+    });
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden py-12">
@@ -179,9 +228,9 @@ export function RegisterPage() {
                 <Button 
                   type="submit" 
                   className="w-full h-12 text-base font-medium shadow-[0_0_20px_rgba(var(--primary),0.2)] mt-4" 
-                  disabled={registerMutation.isPending}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {registerMutation.isPending ? (
+                  {form.formState.isSubmitting ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
                     <>

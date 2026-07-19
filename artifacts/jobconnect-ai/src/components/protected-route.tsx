@@ -1,41 +1,85 @@
-import { useGetMe } from "@workspace/api-client-react";
+import { ReactNode, useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { ReactNode, useEffect } from "react";
-import { Shell } from "./shell";
 import { Loader2 } from "lucide-react";
+
+import { getMe } from "@/api/auth";
+import { Shell } from "./shell";
 
 interface ProtectedRouteProps {
   children: ReactNode;
   allowedRoles?: string[];
 }
 
-export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { data: user, isLoading } = useGetMe();
-  const [location, setLocation] = useLocation();
+export function ProtectedRoute({
+  children,
+  allowedRoles,
+}: ProtectedRouteProps) {
+  const [, setLocation] = useLocation();
+
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      setLocation(`/auth/login?redirect=${encodeURIComponent(location)}`);
-    } else if (!isLoading && user && allowedRoles && !allowedRoles.includes(user.role)) {
-      setLocation(`/dashboard/${user.role}`);
-    }
-  }, [user, isLoading, location, setLocation, allowedRoles]);
+    async function checkAuth() {
+      const token = localStorage.getItem("jwtToken");
 
-  if (isLoading) {
+      if (!token) {
+        setLocation("/auth/login");
+        return;
+      }
+
+      try {
+        const response = await getMe(token);
+
+        const currentUser = response.user;
+
+        setUser(currentUser);
+
+        if (
+          allowedRoles &&
+          !allowedRoles.includes(currentUser.role)
+        ) {
+          switch (currentUser.role) {
+            case "STUDENT":
+              setLocation("/dashboard/student");
+              return;
+
+            case "RECRUITER":
+              setLocation("/dashboard/recruiter");
+              return;
+
+            case "ADMIN":
+              setLocation("/");
+              return;
+
+            default:
+              setLocation("/");
+              return;
+          }
+        }
+      } catch (err) {
+        localStorage.removeItem("jwtToken");
+        setLocation("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkAuth();
+  }, [allowedRoles, setLocation]);
+
+  if (loading) {
     return (
       <Shell>
-        <div className="flex-1 flex items-center justify-center min-h-[60vh]">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="text-muted-foreground animate-pulse">Authenticating...</p>
-          </div>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
       </Shell>
     );
   }
 
-  if (!user || (allowedRoles && !allowedRoles.includes(user.role))) {
-    return null; // Will redirect in useEffect
+  if (!user) {
+    return null;
   }
 
   return <>{children}</>;

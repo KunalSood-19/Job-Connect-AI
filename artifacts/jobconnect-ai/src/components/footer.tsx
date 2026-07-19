@@ -40,7 +40,7 @@ export function Footer() {
               <li><Link href="/companies" className="text-sm text-muted-foreground hover:text-primary transition-colors">Companies</Link></li>
               <li><Link href="/resume-builder" className="text-sm text-muted-foreground hover:text-primary transition-colors">Resume Builder</Link></li>
               <li><Link href="/resume-analysis" className="text-sm text-muted-foreground hover:text-primary transition-colors">Resume Analyzer</Link></li>
-              <li><Link href="/interview-practice" className="text-sm text-muted-foreground hover:text-primary transition-colors">Interview Practice</Link></li>
+              <li><Link href="/interview" className="text-sm text-muted-foreground hover:text-primary transition-colors">Interview Practice</Link></li>
               <li><Link href="/career-roadmap" className="text-sm text-muted-foreground hover:text-primary transition-colors">Career Roadmap</Link></li>
             </ul>
           </div>

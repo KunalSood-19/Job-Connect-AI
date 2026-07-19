@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { Bot, UploadCloud, FileText, CheckCircle, Target, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { analyzeResume } from "@/api/resume";
 
 export function ResumeAnalysisPage() {
   const { data: user } = useGetMe();
@@ -13,29 +14,32 @@ export function ResumeAnalysisPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
+const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleAnalyze = () => {
-    if (!resumeText) return;
-    
+ const handleAnalyze = async () => {
+  if (!selectedFile) {
+    alert("Please upload a resume.");
+    return;
+  }
+
+  try {
     setIsAnalyzing(true);
-    // Simulate API call for demo purposes
-    setTimeout(() => {
-      setResult({
-        atsScore: 78,
-        strength: 'good',
-        missingKeywords: ['React Context', 'GraphQL', 'Agile Methodology', 'CI/CD'],
-        grammarSuggestions: ['Consider replacing "responsible for" with action verbs like "spearheaded" or "directed"'],
-        formattingSuggestions: ['Use bullet points instead of paragraphs for experience descriptions', 'Ensure consistent date formatting (e.g., MM/YYYY)'],
-        suggestions: [
-          'Quantify your achievements (e.g., "Increased performance by 20%") instead of just stating duties.',
-          'Your summary statement is a bit generic. Tailor it to highlight your specific frontend expertise.',
-          'Move the Skills section above Experience to make it more visible to technical recruiters.'
-        ],
-        extractedSkills: ['JavaScript', 'React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Git']
-      });
-      setIsAnalyzing(false);
-    }, 2500);
-  };
+
+    const analysis = await analyzeResume(selectedFile);
+
+    setResult(analysis);
+
+  } catch (err) {
+    console.error(err);
+    alert("Resume analysis failed.");
+  } finally {
+    setIsAnalyzing(false);
+  }
+};{selectedFile && (
+  <div className="mt-3 text-sm text-green-500">
+    Selected File: {selectedFile.name}
+  </div>
+)}
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl">
@@ -57,20 +61,33 @@ export function ResumeAnalysisPage() {
               <CardDescription>Paste your resume text or upload a PDF/Word document.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center mb-4 hover:bg-white/5 transition-colors cursor-pointer group">
-                <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground mb-4 group-hover:text-primary transition-colors" />
-                <p className="font-medium mb-1">Click to upload or drag and drop</p>
-                <p className="text-xs text-muted-foreground">PDF, DOCX, or TXT (Max 5MB)</p>
-              </div>
-              
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-white/10" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or paste text</span>
-                </div>
-              </div>
+              <label className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center mb-4 hover:bg-white/5 transition-colors cursor-pointer group block">
+
+  <UploadCloud className="w-10 h-10 mx-auto text-muted-foreground mb-4 group-hover:text-primary transition-colors" />
+
+  <p className="font-medium mb-1">
+    Click to upload or drag and drop
+  </p>
+
+  <p className="text-xs text-muted-foreground">
+    PDF, DOCX or TXT (Max 5MB)
+  </p>
+
+  <input
+    type="file"
+    accept=".pdf,.doc,.docx,.txt"
+    hidden
+    onChange={(e) => {
+      const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      setSelectedFile(file);
+
+      console.log(file);
+    }}
+  />
+</label>
               
               <Textarea 
                 className="mt-4 min-h-[200px] bg-background/50 border-white/10 focus-visible:ring-primary/50" 
@@ -96,7 +113,7 @@ export function ResumeAnalysisPage() {
               <Button 
                 size="lg" 
                 className="w-full h-14 text-lg bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(var(--primary),0.3)]" 
-                disabled={!resumeText}
+                disabled={!selectedFile}
                 onClick={handleAnalyze}
               >
                 <Sparkles className="w-5 h-5 mr-2" /> Analyze My Resume

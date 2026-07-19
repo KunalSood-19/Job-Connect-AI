@@ -1,5 +1,5 @@
-import { useGetMe, useListJobs } from "@workspace/api-client-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getJobs } from "@/api/jobs";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,15 +16,58 @@ export function JobsPage() {
   const [location, setLocationQuery] = useState("");
   const debouncedLocation = useDebounce(location, 500);
   const [type, setType] = useState<string>("all");
-  
-  const { data: jobsResponse, isLoading } = useListJobs({ 
-    q: debouncedSearch || undefined,
-    location: debouncedLocation || undefined,
-    type: type !== "all" ? type : undefined,
-    limit: 20
-  });
+  const [under100, setUnder100] = useState(false);
+  const [displayJobs, setDisplayJobs] = useState<any[]>([]);
+   const [experience, setExperience] = useState("all");
+   const [remoteOnly, setRemoteOnly] = useState(false);
+const [isLoading, setIsLoading] = useState(true);
 
-  const displayJobs = jobsResponse?.jobs?.length ? jobsResponse.jobs : mockJobs;
+useEffect(() => {
+  async function loadJobs() {
+    try {
+      setIsLoading(true);
+
+const response = await getJobs({
+  search: debouncedSearch || undefined,
+  location: debouncedLocation || undefined,
+
+  employmentType:
+    type !== "all"
+      ? type.toUpperCase().replace("-", "_")
+      : undefined,
+
+  experienceLevel:
+    experience !== "all"
+      ? experience.toUpperCase()
+      : undefined,
+
+  remoteOnly: remoteOnly,
+
+  under100Applicants: under100,
+
+  page: 1,
+  limit: 20,
+});
+
+      setDisplayJobs(response.jobs || []);
+    } catch (err) {
+      console.error(err);
+      setDisplayJobs([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  loadJobs();
+}, [
+  debouncedSearch,
+  debouncedLocation,
+  type,
+  experience,
+  remoteOnly,
+  under100,
+]);
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -87,7 +130,12 @@ export function JobsPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground">Experience Level</label>
-              <Select defaultValue="all">
+             
+
+<Select
+  value={experience}
+  onValueChange={setExperience}
+>
                 <SelectTrigger className="glass bg-background/50">
                   <SelectValue placeholder="All levels" />
                 </SelectTrigger>
@@ -103,14 +151,24 @@ export function JobsPage() {
 
             <div className="space-y-2 pt-4 border-t border-white/5">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-white/20 bg-background/50 text-primary focus:ring-primary/50 w-4 h-4" />
+<input
+  type="checkbox"
+  checked={remoteOnly}
+  onChange={(e) => setRemoteOnly(e.target.checked)}
+  className="rounded border-white/20 bg-background/50 text-primary focus:ring-primary/50 w-4 h-4"
+/>
                 <span className="text-sm font-medium">Remote Only</span>
               </label>
             </div>
             
             <div className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-white/20 bg-background/50 text-primary focus:ring-primary/50 w-4 h-4" />
+             <input
+  type="checkbox"
+  checked={under100}
+  onChange={(e) => setUnder100(e.target.checked)}
+  className="rounded border-white/20 bg-background/50 text-primary focus:ring-primary/50 w-4 h-4"
+/>
                 <span className="text-sm font-medium">Under 100 applicants</span>
               </label>
             </div>
@@ -157,9 +215,19 @@ export function JobsPage() {
                 <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">
                   We couldn't find any jobs matching your current filters. Try adjusting your search criteria.
                 </p>
-                <Button variant="outline" onClick={() => { setSearch(""); setLocationQuery(""); setType("all"); }}>
-                  Clear Filters
-                </Button>
+              <Button
+  variant="outline"
+  onClick={() => {
+    setSearch("");
+    setLocationQuery("");
+    setType("all");
+    setExperience("all");
+    setRemoteOnly(false);
+    setUnder100(false);
+  }}
+>
+  Clear Filters
+</Button>
               </CardContent>
             </Card>
           ) : (
@@ -198,7 +266,7 @@ export function JobsPage() {
                           <Badge variant="secondary" className="bg-secondary/50 text-secondary-foreground border-white/5 font-normal capitalize">
                             {job.type}
                           </Badge>
-                          {job.skills?.slice(0, 3).map(skill => (
+                          {job.skills?.slice(0, 3).map((skill: string) => (
                             <Badge key={skill} variant="outline" className="bg-background/50 border-white/10 font-normal text-muted-foreground">
                               {skill}
                             </Badge>

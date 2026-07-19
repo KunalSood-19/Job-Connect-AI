@@ -173,7 +173,10 @@ export function InterviewPracticePage() {
     }
   };
 
-  const avgScore = answers.length ? Math.round(answers.reduce((s, a) => s + a.score, 0) / answers.length) : 0;
+  const avgScore = answers.length ? Math.round(answers.reduce(
+  (sum: number, item: { score: number }) => sum + item.score,
+  0
+) / answers.length) : 0;
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   if (stage === "landing") {

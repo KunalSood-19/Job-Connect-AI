@@ -2,7 +2,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, Link } from "wouter";
-import { useLogin, useGetMe } from "@workspace/api-client-react";
+import { login, getMe } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,15 +25,44 @@ const formSchema = z.object({
 
 export function LoginPage() {
   const [, setLocation] = useLocation();
-  const { data: user, isLoading: isUserLoading } = useGetMe();
-  const loginMutation = useLogin();
   const { toast } = useToast();
+const goToDashboard = (role?: string) => {
+  switch (role?.toUpperCase()) {
+    case "STUDENT":
+      setLocation("/dashboard/student");
+      break;
 
-  useEffect(() => {
-    if (!isUserLoading && user) {
-      setLocation(`/dashboard/${user.role}`);
+    case "RECRUITER":
+      setLocation("/dashboard/recruiter");
+      break;
+
+    case "ADMIN":
+      setLocation("/dashboard/admin");
+      break;
+
+    default:
+      setLocation("/");
+  }
+};
+useEffect(() => {
+  async function checkUser() {
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) return;
+
+    try {
+      const data = await getMe(token);
+
+      if (data.user) {
+        goToDashboard(data.user.role);
+      }
+    } catch {
+      localStorage.removeItem("jwtToken");
     }
-  }, [user, isUserLoading, setLocation]);
+  }
+
+  checkUser();
+}, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,28 +72,37 @@ export function LoginPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    loginMutation.mutate(
-      { data: values },
-      {
-        onSuccess: (data) => {
-          localStorage.setItem("jwtToken", data.token);
-          toast({
-            title: "Welcome back",
-            description: "You have successfully logged in.",
-          });
-          setLocation(`/dashboard/${data.user.role}`);
-        },
-        onError: (error: any) => {
-          toast({
-            title: "Login failed",
-            description: error?.message || "Please check your credentials and try again.",
-            variant: "destructive",
-          });
-        },
-      }
+async function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    const data = await login(
+      values.email,
+      values.password
     );
+
+    localStorage.setItem(
+      "jwtToken",
+      data.token
+    );
+
+    toast({
+      title: "Welcome back",
+      description: "Login successful",
+    });
+
+    goToDashboard(data.user.role);
+
+  } catch (error: any) {
+
+    toast({
+      title: "Login failed",
+      description:
+        error?.response?.data?.message ??
+        "Invalid credentials",
+      variant: "destructive",
+    });
+
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative overflow-hidden">
@@ -117,9 +155,9 @@ export function LoginPage() {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-foreground">Password</FormLabel>
-                        <a href="#" className="text-sm text-primary hover:underline" tabIndex={-1}>
+                        <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline" tabIndex={-1}>
                           Forgot password?
-                        </a>
+                        </Link>
                       </div>
                       <FormControl>
                         <Input 
@@ -136,9 +174,9 @@ export function LoginPage() {
                 <Button 
                   type="submit" 
                   className="w-full h-12 text-base font-medium shadow-[0_0_20px_rgba(var(--primary),0.2)] mt-2" 
-                  disabled={loginMutation.isPending}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {loginMutation.isPending ? (
+                  {form.formState.isSubmitting? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
                     <>

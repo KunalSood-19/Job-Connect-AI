@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Brain, Target, FileText, Zap, ChevronRight, CheckCircle2, TrendingUp, Users, Building, ShieldCheck, MapPin, DollarSign, Clock, Star } from "lucide-react";
 import { mockJobs, mockCompanies, formatSalary, timeAgo } from "@/lib/mock-data";
 import { motion } from "framer-motion";
-import { useGetTrendingJobs } from "@workspace/api-client-react";
+import { getTrendingJobs } from "@/api/jobs";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { useEffect, useState } from "react";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+ visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } } 
 };
 
 const stagger = {
@@ -25,13 +26,31 @@ const stagger = {
 };
 
 export function LandingPage() {
-  const { data: trendingJobsApi, isLoading } = useGetTrendingJobs();
-  const displayJobs = trendingJobsApi && trendingJobsApi.length > 0 ? trendingJobsApi.slice(0, 4) : mockJobs.slice(0, 4);
+  const [trendingJobs, setTrendingJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+  const loadTrendingJobs = async () => {
+    try {
+      const res = await getTrendingJobs();
 
+      setTrendingJobs(res.jobs || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadTrendingJobs();
+}, []);
+ const displayJobs =
+  trendingJobs.length > 0
+    ? trendingJobs.slice(0, 4)
+    : mockJobs.slice(0, 4);
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+      <section className="relative pt-16 pb-16 md:pt-24 overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay z-10 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
         
@@ -95,7 +114,7 @@ export function LandingPage() {
 
       {/* Stats Section */}
       <section className="py-12 border-y border-white/5 bg-black/20">
-        <div className="container px-4 md:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { label: "Active Jobs", value: "10,000+" },
@@ -114,7 +133,7 @@ export function LandingPage() {
 
       {/* Features Showcase */}
       <section className="py-24 relative overflow-hidden">
-        <div className="container px-4 md:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">More than just a job board. <br/>An <span className="text-primary">AI career copilot</span>.</h2>
             <p className="text-xl text-muted-foreground">We give you the tools to stand out, practice, and land your dream role.</p>
@@ -162,7 +181,7 @@ export function LandingPage() {
 
       {/* Featured Jobs */}
       <section className="py-24 bg-card/30">
-        <div className="container px-4 md:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Trending Opportunities</h2>
@@ -216,7 +235,7 @@ export function LandingPage() {
                   </div>
                   
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {job.skills?.slice(0, 4).map(skill => (
+                    {job.skills?.slice(0, 4).map((skill: string) => (
                       <span key={skill} className="px-2.5 py-1 rounded-md text-xs font-medium bg-background border border-border text-muted-foreground">
                         {skill}
                       </span>
@@ -295,7 +314,7 @@ export function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-24 relative overflow-hidden">
-        <div className="container px-4 md:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
           <div className="glass-card rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden border-primary/20">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-purple-600/10 to-background z-0"></div>
             <div className="relative z-10 max-w-3xl mx-auto">

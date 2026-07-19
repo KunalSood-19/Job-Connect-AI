@@ -212,7 +212,12 @@
   --shadow-xl: 0px 2px 0px 0px rgba(0, 0, 0, 0.3), 0px 8px 10px -1px rgba(0, 0, 0, 0.5);
   --shadow-2xl: 0px 2px 0px 0px rgba(0, 0, 0, 0.5);
 }
-
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  width: 100%;
+  max-width: 1280px;
+}
 @layer base {
   * {
     @apply border-border;
@@ -305,4 +310,5 @@
   .gradient-bg {
     @apply bg-gradient-to-r from-primary to-purple-600;
   }
+  
 }

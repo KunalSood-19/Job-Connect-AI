@@ -1,8 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { useGetMe, useLogout } from "@workspace/api-client-react";
+import { useEffect, useState } from "react";
+import { getMe } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import { Briefcase, LogOut, Menu, User, UserCircle, Search, Home } from "lucide-react";
+import NotificationBell from "@/components/common/NotificationBell";
 import { ModeToggle } from "./mode-toggle";
+import { socket } from "@/lib/socket";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,17 +17,41 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function Navbar() {
-  const { data: user, isLoading } = useGetMe();
-  const logout = useLogout();
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [location] = useLocation();
+  useEffect(() => {
+  async function loadUser() {
+    const token = localStorage.getItem("jwtToken");
 
-  const handleLogout = () => {
-    logout.mutate(undefined, {
-      onSuccess: () => {
-        window.location.href = "/";
-      },
-    });
-  };
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await getMe(token);
+      setUser(response.user);
+      socket.connect();
+socket.emit("join", response.user.id);
+    } catch {
+      localStorage.removeItem("jwtToken");
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  loadUser();
+}, []);
+
+ const handleLogout = () => {
+  socket.disconnect();
+
+  localStorage.removeItem("jwtToken");
+  setUser(null);
+  window.location.href = "/";
+};
 
   const NavLinks = () => (
     <>
@@ -37,7 +64,7 @@ export function Navbar() {
       <Link href="/resume-builder" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
         Resume Builder
       </Link>
-      <Link href="/interview-practice" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+      <Link href="/interview" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
         Practice Interviews
       </Link>
     </>
@@ -60,10 +87,12 @@ export function Navbar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          
-          {isLoading ? (
+       <div className="flex items-center gap-4">
+  <ModeToggle />
+
+  {user && <NotificationBell />}
+
+  {isLoading ? (
             <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
           ) : user ? (
             <DropdownMenu>
@@ -72,7 +101,7 @@ export function Navbar() {
                   <Avatar className="h-9 w-9 border border-white/10">
                     <AvatarImage src={user.avatarUrl || ""} alt={user.name} />
                     <AvatarFallback className="bg-primary/20 text-primary">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.name || user.email || "U").charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -88,7 +117,18 @@ export function Navbar() {
                 </div>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/${user.role}`} className="w-full cursor-pointer flex items-center">
+                  <Link
+  href={
+    user?.role === "STUDENT"
+      ? "/dashboard/student"
+      : user?.role === "RECRUITER"
+      ? "/dashboard/recruiter"
+      : user?.role === "ADMIN"
+      ? "/dashboard/admin"
+      : "/"
+  }
+  className="w-full cursor-pointer flex items-center"
+>
                     <Home className="mr-2 h-4 w-4" />
                     Dashboard
                   </Link>

@@ -299,7 +299,7 @@ export function CareerRoadmapPage() {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">Practice your interview skills and analyze your resume to maximize your chances of landing {roadmap.targetRole} roles.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button className="bg-primary hover:bg-primary/90 text-white gap-2" asChild>
-                <Link href="/interview-practice">
+                <Link href="/interview">
                   Practice Interviews <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>

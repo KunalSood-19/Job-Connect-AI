@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useListCompanies } from "@workspace/api-client-react";
+// import { useListCompanies } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,9 +46,12 @@ export function CompaniesPage() {
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState("All Industries");
   const [size, setSize] = useState("All Sizes");
+// Backend API is not available in the exported ZIP.
+// Use mock data until a backend is connected.
 
-  const { data: apiCompanies, isLoading } = useListCompanies({ limit: 50 });
-  const companies = (apiCompanies?.companies?.length ? apiCompanies.companies : mockCompanies) as typeof mockCompanies;
+const isLoading = false;
+const companies = mockCompanies;
+  // const companies = (apiCompanies?.length ? apiCompanies : mockCompanies) as typeof mockCompanies;
 
   const filtered = companies.filter(c => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.industry?.toLowerCase().includes(search.toLowerCase());
@@ -184,7 +187,7 @@ function CompanyCard({ company, featured }: { company: typeof mockCompanies[0]; 
             <div className="flex items-center gap-1.5 mb-1">
               <h3 className="font-semibold text-lg group-hover:text-primary transition-colors leading-tight">{company.name}</h3>
               {company.isVerified && (
-                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" title="Verified company" />
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" aria-label="Verified company" />
               )}
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">

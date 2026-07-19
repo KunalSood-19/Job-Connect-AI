@@ -1,4 +1,7 @@
-import { useGetMe, useGetStudentDashboard } from "@workspace/api-client-react";
+import CompleteProfileDialog from "@/components/profile/CompleteProfileDialog";
+import { useEffect, useState } from "react";
+import { getMe } from "@/api/auth";
+import { getStudentDashboard } from "@/api/dashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -9,29 +12,71 @@ import { formatSalary, timeAgo } from "@/lib/mock-data";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export function StudentDashboard() {
-  const { data: user } = useGetMe();
-  const { data: dashboard, isLoading } = useGetStudentDashboard({ query: { enabled: !!user } });
+ const [user, setUser] = useState<any>(null);
+const [dashboard, setDashboard] = useState<any>(null);
+const [isLoading, setIsLoading] = useState(true);
+ const [showPopup, setShowPopup] = useState(false);
+
 
   // Fallback mock data if API doesn't return full dashboard
-  const stats = dashboard || {
-    totalApplications: 12,
-    interviews: 3,
-    savedJobs: 24,
-    profileStrength: 85,
-    atsScore: 78,
-    recentApplications: [],
-    recommendedJobs: [],
-    upcomingInterviews: [],
-    activityByMonth: [
-      { month: 'Jan', count: 2 },
-      { month: 'Feb', count: 5 },
-      { month: 'Mar', count: 4 },
-      { month: 'Apr', count: 8 },
-      { month: 'May', count: 12 },
-      { month: 'Jun', count: 7 }
-    ]
+const stats = {
+  totalApplications: dashboard?.totalApplications ?? 0,
+  interviews: dashboard?.interviews ?? 0,
+  savedJobs: dashboard?.savedJobs ?? 0,
+  profileStrength: dashboard?.profileStrength ?? 20,
+  atsScore: dashboard?.atsScore ?? 0,
+
+  recentApplications: dashboard?.recentApplications ?? [],
+
+  recommendedJobs: dashboard?.recommendedJobs ?? [],
+
+  upcomingInterviews: dashboard?.upcomingInterviews ?? [],
+
+  activityByMonth:
+    dashboard?.activityByMonth ?? [
+      { month: "Jan", count: 0 },
+      { month: "Feb", count: 0 },
+      { month: "Mar", count: 0 },
+      { month: "Apr", count: 0 },
+      { month: "May", count: 0 },
+      { month: "Jun", count: 0 },
+    ],
+};
+
+
+useEffect(() => {
+  const loadDashboard = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+
+      if (!token) return;
+
+      const me = await getMe(token);
+
+      setUser(me.user);
+
+     const res = await getStudentDashboard();
+
+setDashboard(res);
+
+const profile = me.user;
+
+// sirf tab popup dikhao jab profile incomplete ho
+const isIncomplete =
+  !profile.phone ||
+  !profile.location ||
+  !profile.bio;
+
+setShowPopup(isIncomplete);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  loadDashboard();
+}, []);
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 animate-pulse space-y-8">
@@ -46,9 +91,21 @@ export function StudentDashboard() {
       </div>
     );
   }
+ 
 
-  return (
+
+ 
+ return (
+  <>
+    {showPopup && (
+      <CompleteProfileDialog
+        open={showPopup}
+        onClose={() => setShowPopup(false)}
+      />
+    )}
+
     <div className="container mx-auto px-4 py-8 max-w-7xl space-y-8">
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name?.split(' ')[0] || 'User'}</h1>
@@ -61,6 +118,12 @@ export function StudentDashboard() {
           <Button className="bg-primary text-white" asChild>
             <Link href="/jobs">Search Jobs</Link>
           </Button>
+          <Link href="/student/offers">
+ <Button className="bg-primary text-white" asChild>
+ 
+    <span>My Offer Letters</span>
+  </Button>
+</Link>
         </div>
       </div>
 
@@ -159,7 +222,7 @@ export function StudentDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="glass-card border-white/5 hover:border-primary/30 transition-colors group cursor-pointer" onClick={() => window.location.href='/interview-practice'}>
+              <Card className="glass-card border-white/5 hover:border-primary/30 transition-colors group cursor-pointer" onClick={() => window.location.href='/interview'}>
                 <CardContent className="p-5 flex gap-4">
                   <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                     <Brain className="w-5 h-5 text-purple-500" />
@@ -234,38 +297,59 @@ export function StudentDashboard() {
           <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg">AI Matches</CardTitle>
-              <Button variant="ghost" size="sm" asChild className="h-8 px-2 text-xs"><Link href="/jobs/recommended">View all</Link></Button>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              {stats.recommendedJobs && stats.recommendedJobs.length > 0 ? (
-                stats.recommendedJobs.slice(0, 3).map((match, i) => (
-                  <div key={i} className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-white/5 hover:border-primary/20 transition-colors cursor-pointer" onClick={() => window.location.href=`/jobs/${match.job.id}`}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium text-sm line-clamp-1">{match.job.title}</h4>
-                        <p className="text-xs text-muted-foreground">{match.job.companyName}</p>
-                      </div>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs shrink-0">
-                        {match.matchScore}% Match
-                      </Badge>
-                    </div>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {match.matchedSkills.slice(0, 2).map(skill => (
-                        <span key={skill} className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded">{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-6">
-                  <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Target className="w-6 h-6 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">Complete your profile to get personalized AI job matches.</p>
-                  <Button size="sm" asChild><Link href="/profile">Update Profile</Link></Button>
-                </div>
-              )}
-            </CardContent>
+           <Button variant="ghost" size="sm" asChild className="h-8 px-2 text-xs">
+  <Link href="/jobs/recommended">View all</Link>
+</Button>
+</CardHeader>
+
+<CardContent className="grid gap-4">
+  {stats.recommendedJobs && stats.recommendedJobs.length > 0 ? (
+    stats.recommendedJobs.slice(0, 3).map((job: any, i: number) => (
+      <div
+        key={i}
+        className="flex flex-col gap-2 p-3 rounded-lg bg-white/5 border border-white/5 hover:border-primary/20 transition-colors cursor-pointer"
+        onClick={() => (window.location.href = `/jobs/${job.id}`)}
+      >
+        <div className="flex justify-between items-start">
+          <div>
+            <h4 className="font-medium text-sm line-clamp-1">
+              {job.title}
+            </h4>
+
+            <p className="text-xs text-muted-foreground">
+              {job.company?.name ?? "Unknown Company"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1 mt-1">
+          {(job.skills ?? []).slice(0, 3).map((skill: string) => (
+            <span
+              key={skill}
+              className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+    ))
+  ) : (
+    <div className="text-center py-6">
+      <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+        <Target className="w-6 h-6 text-muted-foreground" />
+      </div>
+
+      <p className="text-sm text-muted-foreground mb-4">
+        No recommended jobs available.
+      </p>
+
+      <Button size="sm" asChild>
+        <Link href="/jobs">Browse Jobs</Link>
+      </Button>
+    </div>
+  )}
+</CardContent>
           </Card>
 
           <Card className="glass-card">
@@ -275,29 +359,42 @@ export function StudentDashboard() {
             </CardHeader>
             <CardContent className="grid gap-4">
               {stats.recentApplications && stats.recentApplications.length > 0 ? (
-                stats.recentApplications.slice(0, 4).map((app, i) => (
+                stats.recentApplications.slice(0, 4).map((app: any, i: number) => (
                   <div key={i} className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center shrink-0">
-                        {app.job?.companyLogoUrl ? (
-                          <img src={app.job.companyLogoUrl} alt={app.job.companyName} className="w-full h-full rounded object-cover" />
-                        ) : (
-                          <Briefcase className="w-4 h-4" />
-                        )}
+                       {app.job?.company?.logo ? (
+  <img
+    src={app.job.company.logo}
+    alt={app.job.company.name}
+    className="w-full h-full rounded object-cover"
+  />
+) : (
+  <Briefcase className="w-4 h-4" />
+)}
                       </div>
                       <div>
-                        <p className="font-medium text-sm line-clamp-1">{app.job?.title || 'Unknown Role'}</p>
-                        <p className="text-xs text-muted-foreground">{app.job?.companyName || 'Unknown Company'}</p>
+                    <p className="font-medium text-sm line-clamp-1">
+  {app.job?.title ?? "Unknown Role"}
+</p>
+
+<p className="text-xs text-muted-foreground">
+  {app.job?.company?.name ?? "Unknown Company"}
+</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 capitalize
-                      ${app.status === 'applied' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : ''}
-                      ${app.status === 'reviewing' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : ''}
-                      ${app.status === 'interview' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : ''}
-                      ${app.status === 'rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' : ''}
-                    `}>
-                      {app.status}
-                    </Badge>
+                   <Badge
+  variant="outline"
+  className={`text-[10px] px-1.5 py-0 capitalize
+    ${app.status === "APPLIED" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" : ""}
+    ${app.status === "REVIEWING" ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" : ""}
+    ${app.status === "INTERVIEW" ? "bg-purple-500/10 text-purple-500 border-purple-500/20" : ""}
+    ${app.status === "REJECTED" ? "bg-red-500/10 text-red-500 border-red-500/20" : ""}
+    ${app.status === "SHORTLISTED" ? "bg-green-500/10 text-green-500 border-green-500/20" : ""}
+  `}
+>
+  {app.status}
+</Badge>
                   </div>
                 ))
               ) : (
@@ -311,5 +408,6 @@ export function StudentDashboard() {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 }
