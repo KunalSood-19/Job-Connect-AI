@@ -83,7 +83,7 @@ function ProtectedShellRoute({
     </Shell>
   );
 }
-
+console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
 function Router() {
   return (
     <Switch>

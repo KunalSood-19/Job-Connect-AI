@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000/api";
+  "http://const API = import.meta.env.VITE_API_URL!;/api";
 
 export async function generateSummary(data: any) {
   const token = localStorage.getItem("jwtToken");
