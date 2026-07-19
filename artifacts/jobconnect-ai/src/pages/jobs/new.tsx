@@ -25,15 +25,36 @@ import { ArrowLeft, Briefcase, Sparkles, Building2 } from "lucide-react";
 import { Link } from "wouter";
 
 export function PostJobPage() {
-  const { data: user, isLoading: userLoading, refetch } = useGetMe();
+  const [user, setUser] = useState<any>(null);
+const [userLoading, setUserLoading] = useState(true);
   const { mutateAsync: createJob, isPending: submitting } = useCreateJob();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   // Force refetch on mount to bypass React Query cache
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
+ useEffect(() => {
+  const token = localStorage.getItem("jwtToken");
+
+  console.log("TOKEN:", token);
+
+  fetch("https://jobconnect-backend-mmkw.onrender.com/api/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(async (r) => {
+      const data = await r.json();
+      console.log("STATUS:", r.status);
+      console.log("DATA:", data);
+
+      setUser(data);
+      setUserLoading(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      setUserLoading(false);
+    });
+}, []);
 
   // Form states
   const [title, setTitle] = useState("");
