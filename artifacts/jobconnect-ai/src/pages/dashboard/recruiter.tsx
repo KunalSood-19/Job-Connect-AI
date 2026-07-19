@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   Briefcase,
   Users,
@@ -62,6 +62,7 @@ type MeResponse = {
 };
 
 export function RecruiterDashboard() {
+  const [, setLocation] = useLocation();
   const { data: userResponse } = useGetMe() as { data: MeResponse | undefined };
   const profile = userResponse?.user;
 
@@ -178,11 +179,9 @@ export function RecruiterDashboard() {
               </Button>
               <Button
                 className="bg-primary text-white flex items-center gap-2"
-                asChild
+                onClick={() => setLocation("/jobs/new")}
               >
-                <Link href="/jobs/new">
-                  <Plus className="w-4 h-4" /> Post New Job
-                </Link>
+                <Plus className="w-4 h-4" /> Post New Job
               </Button>
             </div>
           </div>

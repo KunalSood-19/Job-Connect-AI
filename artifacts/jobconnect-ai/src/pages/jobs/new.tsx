@@ -23,14 +23,18 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Briefcase, Sparkles, Building2 } from "lucide-react";
 import { Link } from "wouter";
-
 export function PostJobPage() {
+
   const [user, setUser] = useState<any>(null);
-const [userLoading, setUserLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
+
   const { mutateAsync: createJob, isPending: submitting } = useCreateJob();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-
+console.log("USER =", user);
+console.log("USER.USER =", (user as any)?.user);
+console.log("RECRUITER =", (user as any)?.user?.recruiter);
+console.log("COMPANY ID =", (user as any)?.user?.recruiter?.companyId);
   // Force refetch on mount to bypass React Query cache
  useEffect(() => {
   const token = localStorage.getItem("jwtToken");
@@ -68,7 +72,14 @@ const [userLoading, setUserLoading] = useState(true);
   const [requirements, setRequirements] = useState("");
   const [benefits, setBenefits] = useState("");
 
-  const recruiterProfile = (user as any)?.user?.recruiter || (user as any)?.recruiter;
+const recruiterProfile =
+  (user as any)?.user?.recruiter ??
+  (user as any)?.recruiter ??
+  (user as any)?.data?.user?.recruiter ??
+  (user as any)?.data?.recruiter;
+
+console.log(user);
+console.log(recruiterProfile);
   const companyId = recruiterProfile?.companyId;
 
   console.log("[DEBUG] PostJobPage Auth State:", {
