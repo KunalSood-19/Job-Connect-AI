@@ -28,8 +28,7 @@ export function PostJobPage() {
 
   const [user, setUser] = useState<any>(null);
   const [userLoading, setUserLoading] = useState(true);
-
-  const { mutateAsync: createJob, isPending: submitting } = useCreateJob();
+const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 console.log("USER =", user);
@@ -135,7 +134,28 @@ console.log(recruiterProfile);
         benefits: benefits || undefined,
       };
 
-      await createJob({ data: jobData as any });
+    setSubmitting(true);
+
+const token = localStorage.getItem("jwtToken");
+
+const response = await fetch(
+  "https://jobconnect-backend-mmkw.onrender.com/api/jobs",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(jobData),
+  }
+);
+
+setSubmitting(false);
+
+if (!response.ok) {
+  const text = await response.text();
+  throw new Error(text || "Failed to create job");
+}
 
       toast({
         title: "Success",
