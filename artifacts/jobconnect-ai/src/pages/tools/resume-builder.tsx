@@ -268,10 +268,7 @@ export function ResumeBuilderPage() {
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-primary" />
-            {/* <span className="font-semibold">Resume Builder</span> */}
-            {/* <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
-              Beta
-            </Badge> */}
+           
           </div>
           <div className="flex items-center gap-2">
   <Button
