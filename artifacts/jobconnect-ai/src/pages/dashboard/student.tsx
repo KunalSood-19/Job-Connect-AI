@@ -106,7 +106,7 @@ export function StudentDashboard() {
               <Link href="/jobs">Search Jobs</Link>
             </Button>
             <Button className="bg-primary text-white flex-1 sm:flex-initial text-xs sm:text-sm" asChild>
-              <Link href="/student/offers">My Offer Letters</Link>
+              <Link href="/student/offers">Offer Letter</Link>
             </Button>
           </div>
         </div>
