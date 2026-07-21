@@ -304,7 +304,7 @@ export function ResumeBuilderPage() {
       className="gap-2 bg-primary text-white"
     >
       <Download className="w-4 h-4" />
-      {loading ? "Generating..." : "Export PDF"}
+      {loading ? "Generating..." : "Export"}
     </Button>
   )}
 </PDFDownloadLink>
@@ -321,7 +321,7 @@ export function ResumeBuilderPage() {
             {/* Templates */}
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Template
+                {/* Template */}
               </h2>
               <div className="grid grid-cols-4 gap-2">
                 {TEMPLATES.map((t) => (
