@@ -264,8 +264,8 @@ export function ResumeBuilderPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-white/5 bg-card/30 sticky top-16 z-30">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+     <div className="border-b border-white/5 bg-card/30 sticky top-16 z-30">
+  <div className="container mx-auto px-4 h-10 sm:h-11 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* <FileText className="w-5 h-5 text-primary" /> */}
             {/* <span className="font-semibold">Resume Builder</span> */}
@@ -312,14 +312,14 @@ export function ResumeBuilderPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-3 pb-8">
         <div
           className={`grid gap-8 ${previewOpen ? "lg:grid-cols-2" : "max-w-3xl mx-auto"}`}
         >
           {/* Editor */}
           <div className="space-y-4">
             {/* Templates */}
-            <div className="space-y-3">
+           <div className="space-y-2">
               {/* <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                 Template
               </h2> */}
