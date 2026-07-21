@@ -268,10 +268,10 @@ export function ResumeBuilderPage() {
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-primary" />
-            <span className="font-semibold">Resume Builder</span>
-            <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+            {/* <span className="font-semibold">Resume Builder</span> */}
+            {/* <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
               Beta
-            </Badge>
+            </Badge> */}
           </div>
           <div className="flex items-center gap-2">
   <Button
@@ -320,9 +320,9 @@ export function ResumeBuilderPage() {
           <div className="space-y-4">
             {/* Templates */}
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {/* Template */}
-              </h2>
+              {/* <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Template
+              </h2> */}
               <div className="grid grid-cols-4 gap-2">
                 {TEMPLATES.map((t) => (
                   <button
