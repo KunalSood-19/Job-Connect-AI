@@ -264,7 +264,7 @@ export function ResumeBuilderPage() {
   return (
     <div className="min-h-screen bg-background pt-20">
       {/* Header */}
-     <div className="border-b border-white/5 bg-card/30 sticky top-[56px] z-30">
+     <div className="border-b border-white/5 bg-card/30">
   <div className="container mx-auto px-4 h-10 sm:h-11 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* <FileText className="w-5 h-5 text-primary" /> */}
